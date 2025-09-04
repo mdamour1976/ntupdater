@@ -24,8 +24,8 @@ type GitHubRelease struct {
 }
 
 var (
-	latestVersion           = "1.0.22"
-	lastKnownWorkingVersion = "1.0.22"
+	latestVersion           = "1.0.0"
+	lastKnownWorkingVersion = "1.0.0"
 	failedVersions          []string
 	ghRelease               GitHubRelease
 )
