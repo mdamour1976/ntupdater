@@ -135,7 +135,7 @@ func startChildProcess(version string) {
 func main() {
 	updateIntervalFlag := flag.Int("update-interval", 60, "Specify the update checking interval in minutes")
 	portFlag := flag.Int("ipc-port", 9999, "Specify the update checking interval in hours")
-	flag.StringVar(&lastKnownWorkingVersion, "known-working-version", "1.0.22", "Specify the last known working version")
+	flag.StringVar(&lastKnownWorkingVersion, "known-working-version", "1.0.0", "Specify the last known working version")
 	flag.Parse()
 
 	flag.VisitAll(func(f *flag.Flag) {
