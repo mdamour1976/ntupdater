@@ -1,0 +1,18 @@
+version: 2
+
+project_name: driver
+
+builds:
+  - id: driver
+    main: .
+    binary: driver
+    goos: [linux, darwin, windows]
+    goarch: [amd64, 386, arm64]
+
+archives:
+  - id: default
+    formats: [tar.gz, zip]
+    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
