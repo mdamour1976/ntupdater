@@ -148,7 +148,6 @@ func main() {
 	checkForUpdates()
 
 	// start update check polling
-	// consider adding command line args for poll interval
 	go updatePoller(time.Duration(*updateIntervalFlag) * time.Minute)
 
 	// start TCP IPC because it's going to be the most portable
