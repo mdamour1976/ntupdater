@@ -92,43 +92,45 @@ func startIPC(address string) {
 }
 
 func startChildProcess(version string) {
+	for {
+		// download and extract the specified version (if necessary)
+		utils.DownloadAndExtract(version)
 
-	// download and extract the specified version (if necessary)
-	utils.DownloadAndExtract(version)
-
-	// worker program runs indefinitely unless a new version is detected or a critical failure has occurred
-	// start worker with appropriate architecture/platform/version
-	command := "worker"
-	if runtime.GOOS == "windows" {
-		command += ".exe"
-	}
-
-	worker := *exec.Command("./updates/"+version+"/"+command, "--update-interval=1")
-	stdout, err := worker.StderrPipe()
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			log.Println("Worker:", scanner.Text())
+		// worker program runs indefinitely unless a new version is detected or a critical failure has occurred
+		// start worker with appropriate architecture/platform/version
+		command := "worker"
+		if runtime.GOOS == "windows" {
+			command += ".exe"
 		}
-	}()
 
-	if err := worker.Start(); err != nil {
-		panic(err)
-	}
+		worker := exec.Command("./updates/"+version+"/"+command, "--update-interval=1")
+		stdout, err := worker.StderrPipe()
+		if err != nil {
+			panic(err)
+		}
 
-	if err := worker.Wait(); err != nil {
-		log.Println("Failed to start application, rolling back: " + err.Error())
-		failedVersions = append(failedVersions, version)
-		startChildProcess(lastKnownWorkingVersion)
-	} else {
+		go func() {
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				log.Println("Worker:", scanner.Text())
+			}
+		}()
+
+		if err := worker.Start(); err != nil {
+			panic(err)
+		}
+
+		if err := worker.Wait(); err != nil {
+			log.Println("Failed to start application, rolling back: " + err.Error())
+			failedVersions = append(failedVersions, version)
+			version = lastKnownWorkingVersion
+			continue
+		}
+
 		log.Println("Application terminated normally due to pending update")
 		// successful program execution, new version detected
 		lastKnownWorkingVersion = version
-		startChildProcess(latestVersion)
+		version = latestVersion
 	}
 }
 
